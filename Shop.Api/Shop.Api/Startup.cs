@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Proxies;
+using Shop.Api.Services.Logs;
 
 namespace Shop.Api
 {
@@ -30,11 +32,18 @@ namespace Shop.Api
 
             string connection = Configuration.GetConnectionString("Connection");
 
-            services.AddDbContext<ShopContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<ShopContext>(options =>
+            {
+                options.UseLazyLoadingProxies().UseSqlServer(connection);
+            });
 
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
 
             services.AddScoped<IProductsService, ProductsService>();
+            services.AddScoped<IOrdersService, OrdersService>();
+            
+            services.AddScoped<ILogWriterFactory, LogWriterFactory>();
+
 
 
             MapperConfiguration mapperConfig = new MapperConfiguration(configuration =>
@@ -63,6 +72,7 @@ namespace Shop.Api
                     options.RoutePrefix = string.Empty;
                 });
             }
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -9,7 +9,11 @@ namespace Shop.Api.Infrastructure
 
         public MapProfile()
         {
-            //CreateMap<Product, ProductViewModel>().ForMember(x => x.ImagePath, options => options.MapFrom(x => x.Image == null ? null : x.Image.Path));
+            CreateMap<Product, ProductViewModel>().ForMember(x => x.ImagePath, options => options.MapFrom(x => x.Image == null ? null : x.Image.Path));
+
+            CreateMap<Order, OrderViewModel>();
+
+            CreateMap<OrderProduct, OrderProductViewModel>();
         }
     }
 }

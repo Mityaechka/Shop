@@ -7,7 +7,7 @@ namespace Shop.Api.Extensions
     {
         public static ApiResult<TTo> MapApi<TTo, TFrom>(this IMapper mapper, TFrom data)
         {
-            return new ApiResult<TTo> { ErrorCode = 0, Data = mapper.Map<TTo>(data) };
+            return new ApiResult<TTo> { IsError = false, Data = mapper.Map<TTo>(data) };
         }
     }
 }

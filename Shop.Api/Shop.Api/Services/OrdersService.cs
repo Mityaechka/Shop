@@ -7,7 +7,19 @@ using System.Threading.Tasks;
 
 namespace Shop.Api.Services
 {
-    public class OrdersService
+    public interface IOrdersService
+    {
+        Task<int?> AddOrder();
+        Task<bool> HasAnyFormOrder();
+        Task<Order> GetFormOrder();
+        Task<bool> SetOrderStateConfirm(int orderId);
+        Task<bool> SetOrderStatePay(int orderId, OrderInformationCreateViewModel orderInformationModel);
+        Task<bool> TryAddProduct(int orderId, int productId);
+        Task<bool> TryAddProductToFormOrder(int productId);
+        Task<bool> SetFormOrderStatePay(OrderInformationCreateViewModel orderInformationModel);
+    }
+
+    public class OrdersService : IOrdersService
     {
         private readonly IRepository<Order> _orderRepository;
         private readonly IRepository<Product> _productRepository;
@@ -25,9 +37,14 @@ namespace Shop.Api.Services
             return await _orderRepository.All.AnyAsync(x => x.State == OrderState.Form);
         }
 
+        public async Task<Order> GetFormOrder()
+        {
+            return await _orderRepository.All.FirstOrDefaultAsync(x => x.State == OrderState.Form);
+        }
+
         public async Task<int?> AddOrder()
         {
-            if (!await HasAnyFormOrder())
+            if (await HasAnyFormOrder())
                 return null;
 
             var order = new Order
@@ -39,6 +56,18 @@ namespace Shop.Api.Services
             await _orderRepository.SaveAsync();
 
             return order.Id;
+        }
+
+        public async Task<bool> TryAddProductToFormOrder( int productId)
+        {
+            var order = await GetFormOrder();
+
+            if(order == null)
+            {
+                return false;
+            }
+
+            return await TryAddProduct(order.Id, productId);
         }
 
         public async Task<bool> TryAddProduct(int orderId, int productId)
@@ -90,7 +119,19 @@ namespace Shop.Api.Services
             }
         }
 
-        public async Task<bool> SetOrderStatePay(int orderId, OrderInformationCreateViewModel orderInformationModel)
+        public async Task<bool> SetFormOrderStatePay( OrderInformationCreateViewModel orderInformationModel)
+        {
+            var order = await GetFormOrder();
+
+            if (order == null)
+            {
+                return false;
+            }
+
+            return await SetOrderStatePay(order.Id, orderInformationModel);
+
+        }
+            public async Task<bool> SetOrderStatePay(int orderId, OrderInformationCreateViewModel orderInformationModel)
         {
             var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
 

@@ -1,9 +1,18 @@
-﻿namespace Shop.Api.DTO
+﻿using Shop.Api.Data;
+using System.Collections.Generic;
+
+namespace Shop.Api.DTO
 {
     public class OrderViewModel
     {
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public string ImagePath { get; set; }
+        public int Id { get; set; }
+        public OrderState State { get; set; }
+        public List<OrderProductViewModel> Products { get; set; }
+    }
+
+    public class OrderProductViewModel
+    {
+        public ProductViewModel Product { get; set; }
+        public int Count { get; set; }
     }
 }

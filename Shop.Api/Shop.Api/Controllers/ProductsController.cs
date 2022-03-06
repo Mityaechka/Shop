@@ -27,14 +27,22 @@ namespace Shop.Api.Controllers
         [HttpGet]
         public async Task<ApiResult<List<ProductViewModel>>> GetProducts()
         {
-            return _mapper.MapApi<List<ProductViewModel>, List<Product>>(new List<Product>());
+            var products = await _productsService.GetProducts();
+            return _mapper.MapApi<List<ProductViewModel>, List<Product>>(products);
         }
 
-        [Route("{id}")]
+        [Route("{productId}")]
         [HttpGet]
-        public async Task<ApiResult<ProductViewModel>> GetProduct(int id)
+        public async Task<ApiResult<ProductViewModel>> GetProduct(int productId)
         {
-            return _mapper.MapApi<ProductViewModel, Product>(new Product());
+            var product = await _productsService.GetProduct(productId);
+
+            if(product == null)
+            {
+                return ApiResult<ProductViewModel>.Error();
+            }
+
+            return _mapper.MapApi<ProductViewModel, Product>(product);
         }
 
     }
