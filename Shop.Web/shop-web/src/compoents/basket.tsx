@@ -116,13 +116,14 @@ export class Basket extends React.Component<BasketProps, BasketState> {
                     <th style={{ textAlign: 'left' }}>Наименование</th>
                     <th style={{ textAlign: 'left' }}>Цена</th>
                     <th style={{ textAlign: 'left' }}>Кол-во</th>
+                    <th style={{ textAlign: 'left' }}>Стоимость</th>
                 </tr>
                 <tbody>
                     {order.products?.map((product, i) => this.renderItem(product!))}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th id="total" colSpan={2} style={{ textAlign: 'left' }}>Общая стоимость:</th>
+                        <th id="total" colSpan={3} style={{ textAlign: 'left' }}>Общая стоимость:</th>
                         <td>{order.products!.reduce((previousValue, currentValue) => previousValue + currentValue.count! * currentValue.product?.price!, 0)}</td>
                     </tr>
                 </tfoot>
@@ -156,8 +157,9 @@ export class Basket extends React.Component<BasketProps, BasketState> {
     renderItem(product: OrderProduct) {
         return <tr >
             <td>{product!.product!.name}</td>
-            <td>Цена: {product!.product!.price}</td>
-            <td>Кол-во: {product!.count}</td>
+            <td>{product!.product!.price}</td>
+            <td>{product!.count}</td>
+            <td>{product!.count! * product!.product!.price!}</td>
         </tr >;
     }
 

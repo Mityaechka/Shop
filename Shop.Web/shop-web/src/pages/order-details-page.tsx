@@ -131,8 +131,10 @@ export class OrderDetailsPage extends React.Component<{} | any, OrderDetailsStat
             <table >
                 <tr>
                     <th style={{ textAlign: 'left' }}>ID</th>
-                    <th style={{ textAlign: 'left' }}>Уровень</th>
-                    <th style={{ textAlign: 'left' }}>Сообщение</th>
+                    <th style={{ textAlign: 'left' }}>Наименование</th>
+                    <th style={{ textAlign: 'left' }}>Цена</th>
+                    <th style={{ textAlign: 'left' }}>Кол-во</th>
+                    <th style={{ textAlign: 'left' }}>Стоимость</th>
                 </tr>
                 <tbody>
                     {propducts.map((propduct, i) => this.renderProductRow(propduct))}

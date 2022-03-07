@@ -52,6 +52,7 @@ export class ManagerPage extends React.Component<OrdersListProps, ManagerPageSta
 
     renderOrders(orders: Order[]) {
         return <div>
+            <h2>Список заказов</h2>
             <table>
                 <tr>
                     <th>ID</th>

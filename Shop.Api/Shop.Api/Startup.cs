@@ -66,7 +66,8 @@ namespace Shop.Api
                     options.RoutePrefix = string.Empty;
                 });
             }
-            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
+
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins(Configuration.GetSection("WebHosts").Get<string[]>()));
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

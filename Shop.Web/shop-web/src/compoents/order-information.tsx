@@ -16,8 +16,8 @@ class OrderInformationProps {
 export class OrderInformation extends React.Component<OrderInformationProps, OrderInformationState> {
     state: OrderInformationState = {
         isLoading: false,
-        address: "test",
-        cardNumber: "1234123412341234"
+        address: "",
+        cardNumber: ""
     }
 
     constructor(p: OrderInformationProps) {
