@@ -2,6 +2,7 @@
 using Shop.Api.Data;
 using Shop.Api.DTO;
 using Shop.Api.Services.Logs;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,10 @@ namespace Shop.Api.Services
         Task<bool> TryAddProduct(int orderId, int productId);
         Task<bool> TryAddProductToFormOrder(int productId);
         Task<bool> SetFormOrderStatePay(OrderInformationCreateViewModel orderInformationModel);
+        Task<bool> TryRemoveProduct(int orderId, int productId);
+        Task<bool> TryRemoveProductFromFormOrder(int productId);
+        Task<List<Order>> GetOrders();
+        Task<Order> GetOrder(int orderId);
     }
 
     public class OrdersService : IOrdersService
@@ -30,6 +35,15 @@ namespace Shop.Api.Services
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _logWriterFactory = logWriterFactory;
+        }
+
+        public async Task<List<Order>> GetOrders()
+        {
+            return await _orderRepository.All.ToListAsync();
+        }
+        public async Task<Order> GetOrder(int orderId)
+        {
+            return await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
         }
 
         public async Task<bool> HasAnyFormOrder()
@@ -55,19 +69,39 @@ namespace Shop.Api.Services
             _orderRepository.Add(order);
             await _orderRepository.SaveAsync();
 
+            using (ILogWriter orderLogWriter = _logWriterFactory.getOrderLogWriter(order.Id))
+            {
+                await orderLogWriter.AddLog(new LogModel
+                {
+                    Level = LogLevel.Info,
+                    Message = $"Заказ успешно создан"
+                });
+            }
             return order.Id;
         }
 
-        public async Task<bool> TryAddProductToFormOrder( int productId)
+        public async Task<bool> TryAddProductToFormOrder(int productId)
         {
             var order = await GetFormOrder();
 
-            if(order == null)
+            if (order == null)
             {
                 return false;
             }
 
             return await TryAddProduct(order.Id, productId);
+        }
+
+        public async Task<bool> TryRemoveProductFromFormOrder(int productId)
+        {
+            var order = await GetFormOrder();
+
+            if (order == null)
+            {
+                return false;
+            }
+
+            return await TryRemoveProduct(order.Id, productId);
         }
 
         public async Task<bool> TryAddProduct(int orderId, int productId)
@@ -119,7 +153,70 @@ namespace Shop.Api.Services
             }
         }
 
-        public async Task<bool> SetFormOrderStatePay( OrderInformationCreateViewModel orderInformationModel)
+        public async Task<bool> TryRemoveProduct(int orderId, int productId)
+        {
+            var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
+
+            if (order == null)
+            {
+                return false;
+            }
+
+            using (ILogWriter orderLogWriter = _logWriterFactory.getOrderLogWriter(orderId))
+            {
+                var isProductExist = await _productRepository.All.AnyAsync(x => x.Id == productId);
+
+                if (!isProductExist)
+                {
+                    return false;
+                }
+
+                if (order.Products.Any(x => x.ProductId == productId))
+                {
+                    var orderProduct = order.Products.FirstOrDefault(x => x.ProductId == productId);
+
+                    if (orderProduct.Count == 1)
+                    {
+                        order.Products.Remove(orderProduct);
+
+                        await orderLogWriter.AddLog(new LogModel
+                        {
+                            Level = LogLevel.Info,
+                            Message = $"Продукт {productId} полностью убран из заказа"
+                        });
+                    }
+                    else
+                    {
+                        orderProduct.Count--;
+
+                        await orderLogWriter.AddLog(new LogModel
+                        {
+                            Level = LogLevel.Info,
+                            Message = $"Убрана 1 шт. продукта {productId}. Осталось {orderProduct.Count}"
+                        });
+                    }
+
+                    await _orderRepository.SaveAsync();
+
+                    return true;
+                }
+                else
+                {
+                    await orderLogWriter.AddLog(new LogModel
+                    {
+                        Level = LogLevel.Warning,
+                        Message = $"Продукт {productId} отсуствует в заказе. Его невозможно удалить"
+                    });
+
+                    return false;
+                }
+
+
+
+            }
+        }
+
+        public async Task<bool> SetFormOrderStatePay(OrderInformationCreateViewModel orderInformationModel)
         {
             var order = await GetFormOrder();
 
@@ -131,7 +228,7 @@ namespace Shop.Api.Services
             return await SetOrderStatePay(order.Id, orderInformationModel);
 
         }
-            public async Task<bool> SetOrderStatePay(int orderId, OrderInformationCreateViewModel orderInformationModel)
+        public async Task<bool> SetOrderStatePay(int orderId, OrderInformationCreateViewModel orderInformationModel)
         {
             var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
 

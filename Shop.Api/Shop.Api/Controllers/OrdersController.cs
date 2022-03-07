@@ -22,27 +22,43 @@ namespace Shop.Api.Controllers
             _ordersService = ordersService;
             _mapper = mapper;
         }
-        //[Route("")]
-        //[HttpGet]
-        //public async Task<ApiResult<List<OrderViewModel>>> GetOrders()
-        //{
-        //    return _mapper.MapApi<List<OrderViewModel>, List<Product>>(new List<Product>());
-        //}
+
+        [Route("")]
+        [HttpGet]
+        public async Task<ApiResult<List<OrderViewModel>>> GetOrders()
+        {
+            var orders = await _ordersService.GetOrders();
+            return _mapper.MapApi<List<OrderViewModel>, List<Order>>(orders);
+        }
+
+        [Route("{orderId}")]
+        [HttpGet]
+        public async Task<ApiResult<OrderWithProductsAndLogsViewModel>> GetOrder(int orderId)
+        {
+            var order = await _ordersService.GetOrder(orderId);
+
+            if (order == null)
+            {
+                return ApiResult<OrderWithProductsAndLogsViewModel>.Error();
+            }
+
+            return _mapper.MapApi<OrderWithProductsAndLogsViewModel, Order>(order);
+        }
 
         [HttpGet]
         [Route("form-order")]
-        public async Task<ApiResult<OrderViewModel>> GetFormOrder()
+        public async Task<ApiResult<OrderWithProductsViewModel>> GetFormOrder()
         {
             var hasFormOrder = await _ordersService.HasAnyFormOrder();
 
             if (!hasFormOrder)
             {
-                return new ApiResult<OrderViewModel> { IsError = false, Data = null };
+                return new ApiResult<OrderWithProductsViewModel> { IsError = false, Data = null };
             }
 
             var order = await _ordersService.GetFormOrder();
 
-            return _mapper.MapApi<OrderViewModel, Order>(order);
+            return _mapper.MapApi<OrderWithProductsViewModel, Order>(order);
         }
 
         [HttpPost]
@@ -59,13 +75,6 @@ namespace Shop.Api.Controllers
             return ApiResult.Success();
         }
 
-        //[Route("{orderId}")]
-        //[HttpGet]
-        //public async Task<ApiResult<OrderViewModel>> GetOrder(int orderId)
-        //{
-        //    return _mapper.MapApi<OrderViewModel, Order>(new Order());
-        //}
-
         [Route("form-order/add/{productId}")]
         [HttpPost]
         public async Task<ApiResult> AddProductToFormOrder(int productId)
@@ -80,12 +89,19 @@ namespace Shop.Api.Controllers
             return ApiResult.Success();
         }
 
-        //[Route("{orderId}/remove/{productId}")]
-        //[HttpPost]
-        //public async Task<ApiResult> RemoveProductFromOrder(int orderId, int productId)
-        //{
-        //    return null;
-        //}
+        [Route("form-order/remove/{productId}")]
+        [HttpPost]
+        public async Task<ApiResult> RemoveProductFromOrder(int productId)
+        {
+            var result = await _ordersService.TryRemoveProductFromFormOrder(productId);
+
+            if (!result)
+            {
+                return ApiResult.Error();
+            }
+
+            return ApiResult.Success();
+        }
 
         [Route("form-order/pay")]
         [HttpPost]
@@ -101,11 +117,18 @@ namespace Shop.Api.Controllers
             return ApiResult.Success();
         }
 
-        //[Route("{orderId}/complete")]
-        //[HttpPost]
-        //public async Task<ApiResult> CompleterOrder(int orderId)
-        //{
-        //    return null;
-        //}
+        [Route("{orderId}/complete")]
+        [HttpPost]
+        public async Task<ApiResult> CompleterOrder(int orderId)
+        {
+            var result = await _ordersService.SetOrderStateConfirm(orderId);
+
+            if (!result)
+            {
+                return ApiResult.Error();
+            }
+
+            return ApiResult.Success();
+        }
     }
 }

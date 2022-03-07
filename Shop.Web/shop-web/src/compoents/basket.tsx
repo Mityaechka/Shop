@@ -1,7 +1,6 @@
 import React from "react";
 import { Order, OrderProduct } from "../models/order";
 import { ApiRequestService } from "../services/api-requests-service";
-import { BasketItem } from "./basket-item";
 
 class BasketState {
     isLoading: boolean = false;
@@ -10,7 +9,12 @@ class BasketState {
     order?: Order;
 }
 
-export class Basket extends React.Component<{}, BasketState> {
+class BasketProps {
+    showOrderInformaionEvent!: Function;
+}
+
+
+export class Basket extends React.Component<BasketProps, BasketState> {
     state: BasketState = {
         isLoading: false,
         hasOrder: false,
@@ -20,8 +24,8 @@ export class Basket extends React.Component<{}, BasketState> {
 
     private apiRequestsService = new ApiRequestService();
 
-    constructor({ }) {
-        super({})
+    constructor(p: BasketProps) {
+        super(p)
 
         this.loadingOrder = this.loadingOrder.bind(this);
         this.addOrder = this.addOrder.bind(this);
@@ -78,6 +82,7 @@ export class Basket extends React.Component<{}, BasketState> {
     }
     render() {
         const { isLoading, order, isError, hasOrder } = this.state;
+        const { showOrderInformaionEvent } = this.props;
 
         if (isLoading) {
             return this.renderLoading();
@@ -89,30 +94,46 @@ export class Basket extends React.Component<{}, BasketState> {
             return this.renderCreateOrder();
         }
 
-        return this.renderBasket(order!)
+        return this.renderBasket(order!, showOrderInformaionEvent!)
     }
 
-    renderBasket(order: Order) {
+    renderBasket(order: Order, showInfoamationEvent: Function) {
         if (!order)
             return <div></div>;
 
         if (order.products?.length == 0) {
             return <div>
-                <p>Вы еще не добавили ни одного заказа</p>
+                <h2>Ваш заказ</h2>
+                <p>Вы еще не добавили ни одного товара</p>
             </div>
         }
 
         return <div>
-            <p>Ваш заказ</p>
-            <div>
-                {order.products?.map((product, i) => <BasketItem product={product!} key={i} />)}
-            </div>
-            <button>Подтвердить заказ</button>
+            <h2>Ваш заказ</h2>
+            <table style={{ width: '100%', height: '50%' }}>
+                <tr>
+                    <th style={{ textAlign: 'left' }}>Наименование</th>
+                    <th style={{ textAlign: 'left' }}>Цена</th>
+                    <th style={{ textAlign: 'left' }}>Кол-во</th>
+                </tr>
+                <tbody>
+                    {order.products?.map((product, i) => this.renderItem(product!))}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th id="total" colSpan={2} style={{ textAlign: 'left' }}>Общая стоимость:</th>
+                        <td>{order.products!.reduce((previousValue, currentValue) => previousValue + currentValue.count! * currentValue.product?.price!, 0)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <button onClick={() => showInfoamationEvent()}>Подтвердить заказ</button>
         </div>
     }
 
     renderCreateOrder() {
         return <div>
+            <h2>Ваш заказ</h2>
             <p>У Вас нет активного заказа</p>
             <button onClick={this.addOrder}>Создать заказ</button>
         </div>
@@ -129,6 +150,14 @@ export class Basket extends React.Component<{}, BasketState> {
             <p>Ошибка загрузки Вашего заказа</p>
             <button onClick={this.loadingOrder}>Повторить попытку</button>
         </div>
+    }
+
+    renderItem(product: OrderProduct) {
+        return <tr >
+            <td>{product!.product!.name}</td>
+            <td>Цена: {product!.product!.price}</td>
+            <td>Кол-во: {product!.count}</td>
+        </tr >;
     }
 
     confirmOrder() {

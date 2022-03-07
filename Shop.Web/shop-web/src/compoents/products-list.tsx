@@ -10,7 +10,12 @@ class ProductsListState {
     products: Product[] = [];
 }
 
-export class ProductList extends React.Component<{}, ProductsListState> {
+class ProductsListProps {
+    addProductEvent!: (productId: number) => void
+    removeProductEvent!: (productId: number) => void
+}
+
+export class ProductList extends React.Component<ProductsListProps, ProductsListState> {
     state: ProductsListState = {
         isLoading: false,
         products: [],
@@ -19,8 +24,8 @@ export class ProductList extends React.Component<{}, ProductsListState> {
 
     private apiRequestsService = new ApiRequestService();
 
-    constructor({ }) {
-        super({})
+    constructor(p: ProductsListProps) {
+        super(p)
 
         this.loadingProducts = this.loadingProducts.bind(this);
     }
@@ -77,8 +82,17 @@ export class ProductList extends React.Component<{}, ProductsListState> {
     }
 
     renderProducts(products: Product[]) {
-        return <div className='products-list__body'>
-            {products.map((product, i) => <ProductCard key={i} product={product} addProduct={() => this.addProductToFormOrder(product.id!)}/>)}
+        const { addProductEvent, removeProductEvent } = this.props;
+        return <div>
+            <h2>Товары</h2>
+            <div className='products-list__body'>
+
+                {products.map((product, i) =>
+                    <ProductCard key={i}
+                        product={product}
+                        addProduct={() => addProductEvent(product.id!)}
+                        removeProduct={() => removeProductEvent(product.id!)} />)}
+            </div>
         </div>
     }
 
@@ -89,7 +103,5 @@ export class ProductList extends React.Component<{}, ProductsListState> {
         </div>
     }
 
-    addProductToFormOrder(productId: number) {
-        this.apiRequestsService.addProductToFormOrder(productId);
-    }
+
 }
