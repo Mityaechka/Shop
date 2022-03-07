@@ -43,6 +43,36 @@ namespace Shop.Api.Services
                  {
                      Id = 4,
                      Path = "/images/watch.jpg"
+                 },
+                 new FileModel
+                 {
+                     Id = 5,
+                     Path = "/images/capcake.jpg"
+                 },
+                 new FileModel
+                 {
+                     Id = 6,
+                     Path = "/images/cola.jpg"
+                 },
+                 new FileModel
+                 {
+                     Id = 7,
+                     Path = "/images/packet.jpg"
+                 },
+                 new FileModel
+                 {
+                     Id = 8,
+                     Path = "/images/parfume.jpg"
+                 },
+                 new FileModel
+                 {
+                     Id = 9,
+                     Path = "/images/soda.jpg"
+                 },
+                 new FileModel
+                 {
+                     Id = 10,
+                     Path = "/images/soda2.jpg"
                  });
 
             modelBuilder.Entity<Product>().HasData(
@@ -76,6 +106,48 @@ namespace Shop.Api.Services
                     Name = "Очки",
                     Price = 5000,
                     ImageId = 4,
+                },
+                new Product
+                {
+                    Id = 5,
+                    Name = "Кекс",
+                    Price = 250,
+                    ImageId = 5,
+                },
+                new Product
+                {
+                    Id = 6,
+                    Name = "Кола",
+                    Price = 300,
+                    ImageId = 6,
+                },
+                new Product
+                {
+                    Id = 7,
+                    Name = "Кофе",
+                    Price = 750,
+                    ImageId = 7,
+                },
+                new Product
+                {
+                    Id = 8,
+                    Name = "Духи",
+                    Price = 15000,
+                    ImageId = 8,
+                },
+                new Product
+                {
+                    Id = 9,
+                    Name = "Напиток",
+                    Price = 500,
+                    ImageId = 9,
+                },
+                new Product
+                {
+                    Id = 10,
+                    Name = "Candy Dry",
+                    Price = 400,
+                    ImageId = 10,
                 });
             #endregion
         }

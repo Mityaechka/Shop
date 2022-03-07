@@ -59,9 +59,11 @@ namespace Shop.Api.Services
         public async Task<int?> AddOrder()
         {
             if (await HasAnyFormOrder())
+            {
                 return null;
+            }
 
-            var order = new Order
+            Order order = new Order
             {
                 State = OrderState.Form
             };
@@ -82,7 +84,7 @@ namespace Shop.Api.Services
 
         public async Task<bool> TryAddProductToFormOrder(int productId)
         {
-            var order = await GetFormOrder();
+            Order order = await GetFormOrder();
 
             if (order == null)
             {
@@ -94,7 +96,7 @@ namespace Shop.Api.Services
 
         public async Task<bool> TryRemoveProductFromFormOrder(int productId)
         {
-            var order = await GetFormOrder();
+            Order order = await GetFormOrder();
 
             if (order == null)
             {
@@ -106,7 +108,7 @@ namespace Shop.Api.Services
 
         public async Task<bool> TryAddProduct(int orderId, int productId)
         {
-            var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
+            Order order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
 
             if (order == null)
             {
@@ -115,7 +117,7 @@ namespace Shop.Api.Services
 
             using (ILogWriter orderLogWriter = _logWriterFactory.getOrderLogWriter(orderId))
             {
-                var isProductExist = await _productRepository.All.AnyAsync(x => x.Id == productId);
+                bool isProductExist = await _productRepository.All.AnyAsync(x => x.Id == productId);
 
                 if (!isProductExist)
                 {
@@ -124,13 +126,13 @@ namespace Shop.Api.Services
 
                 if (order.Products.Any(x => x.ProductId == productId))
                 {
-                    var orderProduct = order.Products.FirstOrDefault(x => x.ProductId == productId);
+                    OrderProduct orderProduct = order.Products.FirstOrDefault(x => x.ProductId == productId);
 
                     orderProduct.Count++;
                 }
                 else
                 {
-                    var orderProduct = new OrderProduct
+                    OrderProduct orderProduct = new OrderProduct
                     {
                         ProductId = productId,
                         OrderId = orderId,
@@ -155,7 +157,7 @@ namespace Shop.Api.Services
 
         public async Task<bool> TryRemoveProduct(int orderId, int productId)
         {
-            var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
+            Order order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
 
             if (order == null)
             {
@@ -164,7 +166,7 @@ namespace Shop.Api.Services
 
             using (ILogWriter orderLogWriter = _logWriterFactory.getOrderLogWriter(orderId))
             {
-                var isProductExist = await _productRepository.All.AnyAsync(x => x.Id == productId);
+                bool isProductExist = await _productRepository.All.AnyAsync(x => x.Id == productId);
 
                 if (!isProductExist)
                 {
@@ -173,7 +175,7 @@ namespace Shop.Api.Services
 
                 if (order.Products.Any(x => x.ProductId == productId))
                 {
-                    var orderProduct = order.Products.FirstOrDefault(x => x.ProductId == productId);
+                    OrderProduct orderProduct = order.Products.FirstOrDefault(x => x.ProductId == productId);
 
                     if (orderProduct.Count == 1)
                     {
@@ -218,7 +220,7 @@ namespace Shop.Api.Services
 
         public async Task<bool> SetFormOrderStatePay(OrderInformationCreateViewModel orderInformationModel)
         {
-            var order = await GetFormOrder();
+            Order order = await GetFormOrder();
 
             if (order == null)
             {
@@ -230,7 +232,7 @@ namespace Shop.Api.Services
         }
         public async Task<bool> SetOrderStatePay(int orderId, OrderInformationCreateViewModel orderInformationModel)
         {
-            var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
+            Order order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
 
             if (order == null)
             {
@@ -261,7 +263,7 @@ namespace Shop.Api.Services
                     return false;
                 }
 
-                var orderInformation = new OrderInformation
+                OrderInformation orderInformation = new OrderInformation
                 {
                     CardNumber = orderInformationModel.CardNumber,
                     Address = orderInformationModel.Address
@@ -284,7 +286,7 @@ namespace Shop.Api.Services
 
         public async Task<bool> SetOrderStateConfirm(int orderId)
         {
-            var order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
+            Order order = await _orderRepository.All.FirstOrDefaultAsync(x => x.Id == orderId);
 
             if (order == null)
             {

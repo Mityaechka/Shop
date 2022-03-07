@@ -1,5 +1,4 @@
 ﻿using Shop.Api.Data;
-using System;
 
 namespace Shop.Api.DTO
 {
@@ -7,6 +6,6 @@ namespace Shop.Api.DTO
     {
         public LogLevel Level { get; set; }
         public string Message { get; set; }
-        
+
     }
 }

@@ -5,7 +5,7 @@ namespace Shop.Api.Data
     public class Product
     {
         public int Id { get; set; }
-        
+
         [StringLength(500)]
         public string Name { get; set; }
         public decimal Price { get; set; }
@@ -14,5 +14,5 @@ namespace Shop.Api.Data
         public virtual FileModel Image { get; set; }
     }
 
-    
+
 }

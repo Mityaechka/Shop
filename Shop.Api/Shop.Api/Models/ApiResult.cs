@@ -14,7 +14,7 @@
             return new ApiResult { IsError = true };
         }
 
-        
+
 
     }
     public class ApiResult<T> : ApiResult

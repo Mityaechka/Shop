@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Api.Data;
 using Shop.Api.DTO;
@@ -18,7 +17,7 @@ namespace Shop.Api.Controllers
         private readonly IProductsService _productsService;
         private readonly IMapper _mapper;
 
-        public ProductsController(IProductsService productsService,IMapper mapper)
+        public ProductsController(IProductsService productsService, IMapper mapper)
         {
             _productsService = productsService;
             _mapper = mapper;
@@ -27,7 +26,7 @@ namespace Shop.Api.Controllers
         [HttpGet]
         public async Task<ApiResult<List<ProductViewModel>>> GetProducts()
         {
-            var products = await _productsService.GetProducts();
+            List<Product> products = await _productsService.GetProducts();
             return _mapper.MapApi<List<ProductViewModel>, List<Product>>(products);
         }
 
@@ -35,9 +34,9 @@ namespace Shop.Api.Controllers
         [HttpGet]
         public async Task<ApiResult<ProductViewModel>> GetProduct(int productId)
         {
-            var product = await _productsService.GetProduct(productId);
+            Product product = await _productsService.GetProduct(productId);
 
-            if(product == null)
+            if (product == null)
             {
                 return ApiResult<ProductViewModel>.Error();
             }

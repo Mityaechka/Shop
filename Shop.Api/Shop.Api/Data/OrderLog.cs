@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Shop.Api.Data
+﻿namespace Shop.Api.Data
 {
     public class OrderLog
     {

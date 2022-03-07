@@ -27,7 +27,7 @@ namespace Shop.Api.Controllers
         [HttpGet]
         public async Task<ApiResult<List<OrderViewModel>>> GetOrders()
         {
-            var orders = await _ordersService.GetOrders();
+            List<Order> orders = await _ordersService.GetOrders();
             return _mapper.MapApi<List<OrderViewModel>, List<Order>>(orders);
         }
 
@@ -35,7 +35,7 @@ namespace Shop.Api.Controllers
         [HttpGet]
         public async Task<ApiResult<OrderWithProductsAndLogsViewModel>> GetOrder(int orderId)
         {
-            var order = await _ordersService.GetOrder(orderId);
+            Order order = await _ordersService.GetOrder(orderId);
 
             if (order == null)
             {
@@ -49,14 +49,14 @@ namespace Shop.Api.Controllers
         [Route("form-order")]
         public async Task<ApiResult<OrderWithProductsViewModel>> GetFormOrder()
         {
-            var hasFormOrder = await _ordersService.HasAnyFormOrder();
+            bool hasFormOrder = await _ordersService.HasAnyFormOrder();
 
             if (!hasFormOrder)
             {
                 return new ApiResult<OrderWithProductsViewModel> { IsError = false, Data = null };
             }
 
-            var order = await _ordersService.GetFormOrder();
+            Order order = await _ordersService.GetFormOrder();
 
             return _mapper.MapApi<OrderWithProductsViewModel, Order>(order);
         }
@@ -65,7 +65,7 @@ namespace Shop.Api.Controllers
         [Route("add-order")]
         public async Task<ApiResult> AddOrder()
         {
-            var result = await _ordersService.AddOrder();
+            int? result = await _ordersService.AddOrder();
 
             if (result == null)
             {
@@ -79,7 +79,7 @@ namespace Shop.Api.Controllers
         [HttpPost]
         public async Task<ApiResult> AddProductToFormOrder(int productId)
         {
-            var result = await _ordersService.TryAddProductToFormOrder(productId);
+            bool result = await _ordersService.TryAddProductToFormOrder(productId);
 
             if (!result)
             {
@@ -93,7 +93,7 @@ namespace Shop.Api.Controllers
         [HttpPost]
         public async Task<ApiResult> RemoveProductFromOrder(int productId)
         {
-            var result = await _ordersService.TryRemoveProductFromFormOrder(productId);
+            bool result = await _ordersService.TryRemoveProductFromFormOrder(productId);
 
             if (!result)
             {
@@ -107,7 +107,7 @@ namespace Shop.Api.Controllers
         [HttpPost]
         public async Task<ApiResult> PayOrder(OrderInformationCreateViewModel orderInformation)
         {
-            var result = await _ordersService.SetFormOrderStatePay(orderInformation);
+            bool result = await _ordersService.SetFormOrderStatePay(orderInformation);
 
             if (!result)
             {
@@ -121,7 +121,7 @@ namespace Shop.Api.Controllers
         [HttpPost]
         public async Task<ApiResult> CompleterOrder(int orderId)
         {
-            var result = await _ordersService.SetOrderStateConfirm(orderId);
+            bool result = await _ordersService.SetOrderStateConfirm(orderId);
 
             if (!result)
             {
