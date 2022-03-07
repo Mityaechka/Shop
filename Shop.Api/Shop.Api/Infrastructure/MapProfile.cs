@@ -15,12 +15,15 @@ namespace Shop.Api.Infrastructure
             CreateMap<Order, OrderWithProductsAndLogsViewModel>();
             CreateMap<Order, OrderViewModel>();
 
+            CreateMap<OrderInformation, OrderInformationViewModel>();
+
             CreateMap<OrderProduct, OrderProductViewModel>();
 
             CreateMap<Log, LogViewModel>();
             CreateMap<OrderLog, LogViewModel>()
                 .ForMember(x => x.Id, options => options.MapFrom(x => x.Log.Id))
                 .ForMember(x => x.Level, options => options.MapFrom(x => x.Log.Level))
+                .ForMember(x => x.Date, options => options.MapFrom(x => x.Log.Date))
                 .ForMember(x => x.Message, options => options.MapFrom(x => x.Log.Message));
 
         }

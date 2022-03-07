@@ -3,10 +3,11 @@ using System;
 
 namespace Shop.Api.DTO
 {
-    public class LogModel
+    public class LogViewModel
     {
+        public int Id { get; set; }
         public LogLevel Level { get; set; }
         public string Message { get; set; }
-        
+        public DateTime Date { get; set; }
     }
 }

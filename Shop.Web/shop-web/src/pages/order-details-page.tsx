@@ -1,8 +1,12 @@
 import React, { ComponentProps } from "react";
 import { useParams } from "react-router-dom";
-import { Log, LogLevel, Order, OrderProduct } from "../models/order";
+import { Order } from "../models/order";
+import { LogLevel } from "../models/log-level";
+import { Log } from "../models/log-model";
+import { OrderProduct } from "../models/order-product";
 import { OrderState } from "../models/order-state";
 import { ApiRequestService } from "../services/api-requests-service";
+import { OrderInformationModel } from "../models/order-inforamation";
 
 
 
@@ -77,7 +81,10 @@ export class OrderDetailsPage extends React.Component<{} | any, OrderDetailsStat
         }
         return <div>
             <h2>Заказ #{order.id}</h2>
-            <p>Состояние: {OrderState.toString(order.state!)}</p>
+            <h3>Данные о заказа</h3>
+            {this.renderorderInformation(order.information)}
+
+            <p><b>Состояние:</b> {OrderState.toString(order.state!)}</p>
             {
                 order.state! == OrderState.Paied ?
                     <div><button onClick={this.completeOrder}>Подтвердить заказ</button></div>
@@ -105,11 +112,12 @@ export class OrderDetailsPage extends React.Component<{} | any, OrderDetailsStat
 
     renderLogs(logs: Log[]) {
         return <div>
-            <table style={{ width:'100%'}}>
+            <table style={{ width: '100%' }}>
                 <tr>
                     <th style={{ textAlign: 'left' }}>ID</th>
                     <th style={{ textAlign: 'left' }}>Уровень</th>
                     <th style={{ textAlign: 'left' }}>Сообщение</th>
+                    <th style={{ textAlign: 'left' }}>Время</th>
                 </tr>
                 <tbody>
                     {logs.map((log, i) => this.renderLogrRow(log))}
@@ -144,6 +152,7 @@ export class OrderDetailsPage extends React.Component<{} | any, OrderDetailsStat
             <td>{log.id}</td>
             <td>{LogLevel.toString(log.level!)}</td>
             <td>{log.message}</td>
+            <td>{log.date}</td>
         </tr>
     }
 
@@ -154,7 +163,19 @@ export class OrderDetailsPage extends React.Component<{} | any, OrderDetailsStat
             <td>{product.product?.price}</td>
             <td>{product.count}</td>
             <td>{product.product!.price! * product!.count!}</td>
+            
         </tr>
+    }
+
+    renderorderInformation(information?: OrderInformationModel) {
+        if (!information) {
+            return <div>Данные о заказе отсуствуют</div>
+        }
+
+        return <div>
+            <p>Адрес: {information!.address}</p>
+            <p>Номер карты: {information!.cardNumber}</p>
+        </div>
     }
 
 }

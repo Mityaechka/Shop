@@ -1,5 +1,6 @@
 import React from "react";
-import { Order, OrderProduct } from "../models/order";
+import { Order } from "../models/order";
+import { OrderProduct } from "../models/order-product";
 import { ApiRequestService } from "../services/api-requests-service";
 
 class BasketState {

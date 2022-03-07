@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Order } from "../models/order";
+import { OrderInformationModel } from "../models/order-inforamation";
 import { OrderState } from "../models/order-state";
 import { ApiRequestService } from "../services/api-requests-service";
 class OrdersListProps {
@@ -76,6 +77,9 @@ export class ManagerPage extends React.Component<OrdersListProps, ManagerPageSta
     renderLoading() {
         return <div>Загрузка данных</div>
     }
+
+
+    
 
 
 } 
